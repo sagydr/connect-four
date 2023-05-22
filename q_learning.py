@@ -1,18 +1,24 @@
 from collections import defaultdict
 
 import gym
-from board import COLUMNS, ROWS
+from board import COLUMNS, ROWS, Players
 # env = gym.make('4InARow/Sag-Env')
 
 import numpy as np
 import random
 from IPython.display import clear_output
-import fourinarow
-import fourinarow.envs
 import gym
+
+from gym.envs.registration import register
+register(
+    id='ConnectFour/Sag-Env',
+    entry_point='.envs.four_env:ConnectFourEnv',
+    max_episode_steps=300,
+)
+
 from gym import envs
 print(envs.registry)
-enviroment = gym.make('FourInARow/Sag-Env').env
+enviroment = gym.make('ConnectFour/Sag-Env').env
 enviroment.reset()
 enviroment.render()
 
@@ -55,6 +61,9 @@ for episode in range(0, num_of_episodes):
     terminated = False
 
     while not terminated:
+        if player == Players.P2.value:  # learn only for P1?
+            continue
+
         # Take learned path or explore new actions based on the epsilon
         if random.uniform(0, 1) < epsilon:
             # action = enviroment.action_space.sample()
@@ -66,7 +75,7 @@ for episode in range(0, num_of_episodes):
                 else:
                     action = np.argmax(q_table[state])
             else:
-                q_table[state] = {1: 0, 2: 0}
+                q_table[state] = 0
                 action = random_column(board=board)
 
         # Take action
@@ -76,16 +85,16 @@ for episode in range(0, num_of_episodes):
 
         # Recalculate
         try:
-            q_value = q_table[state].get(player)
+            q_value = q_table[state]
             # max_value = np.max(q_table[next_state])
             max_value = 0.5
             new_q_value = (1 - alpha) * q_value + alpha * (reward + gamma * max_value)
 
             # Update Q-table
-            q_table[state][player] = new_q_value
+            q_table[state] = new_q_value
             state = next_state['state']
             if state not in q_table:
-                q_table[state] = {1: 0, 2: 0}
+                q_table[state] = 0
             board = next_state['board']
             player = next_state['p']
         except Exception as e:

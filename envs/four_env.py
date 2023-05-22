@@ -8,7 +8,7 @@ from board import Board, COLUMNS, ROWS
 from game import FourInLine
 
 
-class FourInARowEnv(gym.Env):
+class ConnectFourEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
 
     def __init__(self, render_mode="human", size=5):

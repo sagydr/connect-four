@@ -1,1 +1,2 @@
-from fourinarow.envs.four_env import FourInARowEnv
+# from .four_env import ConnectFourEnv
+from envs.four_env import ConnectFourEnv
