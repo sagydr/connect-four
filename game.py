@@ -63,9 +63,11 @@ if __name__ == '__main__':
     while True:
         game.board.render()
         col = int(input(f"input column for {game.current_player}"))
-        assert col in {1, 2, 3, 4, 5, 6, 7}
-        col = col-1  # zero based
-        token, player_played = game.play(col)
-        if game.is_game_over(token=token):
-            print(f"game finished! winner = {player_played}")
-            break
+        if col in {1, 2, 3, 4, 5, 6, 7}:
+            col = col-1  # zero based
+            token, player_played = game.play(col)
+            if game.is_game_over(token=token):
+                print(f"game finished! winner = {player_played}")
+                break
+        else:
+            print("please enter column between 1-7")
