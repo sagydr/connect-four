@@ -50,13 +50,16 @@ class Board:
     #             print(' | ', end=' ')
     #         print("")
 
-    def render(self, human_render=True):
+    def _init_render(self, human_render=True):
         if self._window is None and human_render:
             pygame.init()
             pygame.display.init()
             self._window = pygame.display.set_mode((DISPLAY_SQUARE_SIZE * COLUMNS, DISPLAY_SQUARE_SIZE * ROWS))
         if self._clock is None and human_render:
             self._clock = pygame.time.Clock()
+
+    def render(self, human_render=True, highlight_squares=None):
+        self._init_render()
 
         # 0,0 is TOP LEFT
         canvas = pygame.Surface((DISPLAY_SQUARE_SIZE * COLUMNS, DISPLAY_SQUARE_SIZE * ROWS))
@@ -69,12 +72,23 @@ class Board:
             for r in range(ROWS):
                 if col[r] != 0:
                     # print(f"placing ({(c, r)}) circle in {(c * DISPLAY_SQUARE_SIZE + shift, r * DISPLAY_SQUARE_SIZE + shift)}")
+
                     pygame.draw.circle(
                         canvas,
                         (0, 0, 255) if col[r] == Token.BLUE.value else (255, 0, 0),
                         ((c * DISPLAY_SQUARE_SIZE) + shift, (r * DISPLAY_SQUARE_SIZE) + shift),
                         DISPLAY_SQUARE_SIZE/5,  # radius
                     )
+                    if highlight_squares and (c, r) in highlight_squares:
+                        pygame.draw.rect(
+                            canvas,
+                            (10,255,10),
+                            pygame.Rect((c * DISPLAY_SQUARE_SIZE),
+                                        (r * DISPLAY_SQUARE_SIZE),
+                                        DISPLAY_SQUARE_SIZE,
+                                        DISPLAY_SQUARE_SIZE),
+                            20,  # width
+                        )
 
         # Finally, add some gridlines
         for x in range(COLUMNS + 1):
@@ -108,6 +122,7 @@ class Board:
             return np.transpose(
                 np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2)
             )
+        return canvas
 
 
 if __name__ == '__main__':

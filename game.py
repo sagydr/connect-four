@@ -39,22 +39,25 @@ class FourInLine:
         for col in range(3, COLUMNS):
             for row in range(0, ROWS):
                 if board[col][row] == board[col-1][row] == board[col-2][row] == board[col-3][row] == token.value:
-                    return True
+                    return [(col, row), (col-1, row), (col-2,row), (col-3, row)]
 
         # Vertical checker
         for col in range(0, COLUMNS):
             for row in range(3, ROWS):
                 if board[col][row] == board[col][row-1] == board[col][row-2] == board[col][row-3] == token.value:
-                    return True
+                    return [(col, row), (col, row-1), (col,row-2), (col, row-3)]
 
         # Diagonal checker
         for col in range(0, 4):
             for row in range(0, 3):
                 if (board[col][row] == board[col + 1][row + 1] == board[col + 2][row + 2] == board[col + 3][row + 3] == token.value or
                         board[col + 3][row] == board[col + 2][row + 1] == board[col + 1][row + 2] == board[col][row + 3] == token.value):
-                    return True
+                    if (board[col][row] == board[col + 1][row + 1] == board[col + 2][row + 2] == board[col + 3][row + 3] == token.value):
+                        return [(col, row), (col+1, row+1), (col+2, row+2), (col+3, row+3)]
+                    else:
+                        return [(col + 3, row), (col+2, row+1), (col+1, row+2), (col, row+3)]
 
-        return False
+        return None
 
 
 if __name__ == '__main__':
@@ -64,10 +67,13 @@ if __name__ == '__main__':
         game.board.render()
         col = int(input(f"input column for {game.current_player}"))
         if col in {1, 2, 3, 4, 5, 6, 7}:
+
             col = col-1  # zero based
             token, player_played = game.play(col)
-            if game.is_game_over(token=token):
+            if (highlighted := game.is_game_over(token=token)):
+                game.board.render(highlight_squares=highlighted)
                 print(f"game finished! winner = {player_played}")
+                input(f"press any key to exit")
                 break
         else:
             print("please enter column between 1-7")
